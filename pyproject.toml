@@ -1,7 +1,8 @@
 [project]
 name = "lsc2text"
 version = "0.1.0"
-description = "Add your description here"
+description = "Recognition of Colombian Sign Language (LSC) signs from static images using
+      classical feature extraction (HOG + LBP) and supervised machine learning models."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = []
