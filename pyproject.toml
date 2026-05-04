@@ -5,5 +5,6 @@ description = "Recognition of Colombian Sign Language (LSC) signs from static im
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-"opencv-python"
+"opencv-python",
+"scikit-image"
 ]
