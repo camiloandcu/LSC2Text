@@ -163,8 +163,8 @@ def evaluate_trial(
 
     model = LogisticRegression(
         solver="lbfgs",
-        C=1.0,
-        max_iter=1000,
+        C=0.1,
+        max_iter=100,
         n_jobs=-1,
     )
 
