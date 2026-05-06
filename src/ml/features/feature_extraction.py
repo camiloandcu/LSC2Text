@@ -7,17 +7,17 @@ from skimage.feature import hog, local_binary_pattern
 
 @dataclass
 class HogConfig:
-    orientations: int = 9
+    orientations: int = 10
     pixels_per_cell: Tuple[int, int] = (8, 8)
-    cells_per_block: Tuple[int, int] = (3, 3)
+    cells_per_block: Tuple[int, int] = (1, 1)
     block_norm: str = "L2-Hys"
     transform_sqrt: bool = False
 
 
 @dataclass
 class LbpConfig:
-    radius: int = 1
-    n_points: int = 8
+    radius: int = 2
+    n_points: int = 16
     method: str = "uniform"
 
 

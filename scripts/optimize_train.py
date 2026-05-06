@@ -8,39 +8,49 @@ from typing import List, Tuple
 
 import numpy as np
 
+from src.ml.features.feature_extraction import FeatureConfig, extract_features
 from src.ml.optimization import OptimizationConfig, run_optimization
+from src.ml.preprocessing import Preprocessor
 
 
 DEFAULT_SPLIT_CSV = "data/splits/dataset_lsc70w.csv"
 DEFAULT_MODEL_TYPE = "svm"
 DEFAULT_TRIALS = 30
 DEFAULT_SEED = 1337
+REQUIRED_MANIFEST_COLUMNS = {"filepath", "label", "split"}
 
 
 def load_split_data(csv_path: Path) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    train_features: List[List[float]] = []
+    preprocessor = Preprocessor()
+    feature_config = FeatureConfig()
+
+    train_features: List[np.ndarray] = []
     train_labels: List[str] = []
-    val_features: List[List[float]] = []
+    val_features: List[np.ndarray] = []
     val_labels: List[str] = []
+
     with csv_path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
-        required = {"split", "label"}
-        if reader.fieldnames is None or not required.issubset(reader.fieldnames):
-            raise ValueError("split CSV must include split and label columns")
+        if reader.fieldnames is None or not REQUIRED_MANIFEST_COLUMNS.issubset(reader.fieldnames):
+            required = ", ".join(sorted(REQUIRED_MANIFEST_COLUMNS))
+            raise ValueError(f"split CSV must include manifest columns: {required}")
 
-        feature_columns = [
-            column
-            for column in reader.fieldnames
-            if column not in {"split", "label", "filepath", "participant"}
-        ]
-        if not feature_columns:
-            raise ValueError("split CSV must include numeric feature columns for optimization")
-
-        for row in reader:
-            if row["split"] not in {"train", "val"}:
+        for row_number, row in enumerate(reader, start=2):
+            split = row["split"]
+            if split not in {"train", "val"}:
                 continue
-            vector = [float(row[column]) for column in feature_columns]
-            if row["split"] == "train":
+
+            image_path = resolve_manifest_path(row["filepath"], csv_path)
+            try:
+                image = preprocessor.process_path(str(image_path))
+                vector = extract_features(image, feature_config)
+            except Exception as exc:
+                raise OSError(
+                    f"could not extract features for row {row_number} "
+                    f"from '{row['filepath']}': {exc}"
+                ) from exc
+
+            if split == "train":
                 train_labels.append(row["label"])
                 train_features.append(vector)
             else:
@@ -53,11 +63,23 @@ def load_split_data(csv_path: Path) -> Tuple[np.ndarray, np.ndarray, np.ndarray,
         raise ValueError("no validation rows found in split CSV")
 
     return (
-        np.asarray(train_features, dtype=np.float32),
+        np.vstack(train_features).astype(np.float32, copy=False),
         np.asarray(train_labels),
-        np.asarray(val_features, dtype=np.float32),
+        np.vstack(val_features).astype(np.float32, copy=False),
         np.asarray(val_labels),
     )
+
+
+def resolve_manifest_path(filepath: str, csv_path: Path) -> Path:
+    path = Path(filepath)
+    if path.is_absolute():
+        return path
+
+    cwd_path = Path.cwd() / path
+    if cwd_path.exists():
+        return cwd_path
+
+    return csv_path.parent / path
 
 
 def parse_args() -> argparse.Namespace:

@@ -36,7 +36,8 @@ def train_svm(
     if prefer_gpu:
         logger.info("GPU backend not available; using CPU (scikit-learn)")
 
-    model = SVC(kernel="rbf", probability=False, random_state=seed, **kwargs)
+    model_params = {"kernel": "rbf", "probability": False, "random_state": seed, **kwargs}
+    model = SVC(**model_params)
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         model.fit(features, labels)
@@ -55,7 +56,8 @@ def train_mlp(
     if prefer_gpu:
         logger.info("GPU backend not available; using CPU (scikit-learn)")
 
-    model = MLPClassifier(random_state=seed, max_iter=1000, **kwargs)
+    model_params = {"random_state": seed, "max_iter": 1000, **kwargs}
+    model = MLPClassifier(**model_params)
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         model.fit(features, labels)
