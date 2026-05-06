@@ -1,16 +1,10 @@
 # ///script
 # dependencies =[
-#    "argparse",
-#    "csv",
-#    "pathlib",
-#    "json",
-#    "logging",
-#    "warnings",
-#    "dataclasses",
 #    "optuna",
 #    "numpy",
 #    "scikit-learn",
 #    "matplotlib",
+#    "matplotlib-inline",
 # ]
 # ///
 

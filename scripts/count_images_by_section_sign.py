@@ -1,9 +1,5 @@
 # ///script
 # dependencies =[
-#    "argparse",
-#    "csv",
-#    "collections",
-#    "pathlib",
 # ]
 # ///
 
