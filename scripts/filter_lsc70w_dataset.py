@@ -29,7 +29,7 @@ DEFAULT_ALLOWLIST = (
     "YO",
 )
 REQUIRED_COLUMNS = ("Signo", "Path", "Participante")
-DEFAULT_DATASET_ROOT = Path("data/raw")
+DEFAULT_DATASET_ROOT = Path("data/raw/LSC70")
 
 
 def load_csv_rows(csv_path: Path) -> list[dict[str, str]]:

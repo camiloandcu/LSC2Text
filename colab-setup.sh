@@ -26,13 +26,13 @@ wget -O "$ZIP_PATH" "$DATA_URL"
 
 # --- 5. Unzip dataset ---
 echo "  Extracting dataset..."
-unzip -o "$ZIP_PATH" -d data/raw/
+unzip -q -o "$ZIP_PATH" -d data/raw/
 
 # --- 6. Run scripts using uv ---
 echo "  Running dataset generation..."
-uv run scripts/generate_dataset_csv.py
+uv run ./scripts/generate_dataset_csv.py
 
 echo "  Filtering dataset..."
-uv run scripts/filter_lsc70w_dataset.py
+uv run ./scripts/filter_lsc70w_dataset.py
 
 echo "✅ Setup complete!"
