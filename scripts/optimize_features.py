@@ -1,10 +1,12 @@
-# ///script
+# /// script
 # dependencies =[
 #    "optuna",
 #    "numpy",
 #    "scikit-learn",
 #    "matplotlib",
 #    "matplotlib-inline",
+#    "scikit-image",
+#    "opencv-python",
 # ]
 # ///
 

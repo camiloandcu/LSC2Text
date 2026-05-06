@@ -35,4 +35,7 @@ uv run ./scripts/generate_dataset_csv.py
 echo "  Filtering dataset..."
 uv run ./scripts/filter_lsc70w_dataset.py
 
+# --- 7. Export Python PATH ---
+export PYTHONPATH=.
+
 echo "✅ Setup complete!"
