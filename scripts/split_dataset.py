@@ -9,8 +9,8 @@ from typing import Dict, Iterable, List, Tuple
 from sklearn.model_selection import StratifiedGroupKFold
 
 
-DEFAULT_INPUT_CSV = "data/interim/dataset_lsc70w.csv"
-DEFAULT_OUTPUT_CSV = "data/splits/dataset_lsc70w.csv"
+DEFAULT_INPUT_CSV = "data/processed/dataset_lsc70anh_abcde.csv"
+DEFAULT_OUTPUT_CSV = "data/splits/dataset_lsc70anh_abcde.csv"
 DEFAULT_SEED = 1337
 DEFAULT_VAL_RATIO = 0.2
 
@@ -115,7 +115,7 @@ def summarize_split(rows: List[Dict[str, str]], train_idx: List[int], val_idx: L
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Create stratified group splits for LSC70W")
+    parser = argparse.ArgumentParser(description="Create stratified group splits for a filtered LSC70 dataset")
     parser.add_argument("--input-csv", default=DEFAULT_INPUT_CSV)
     parser.add_argument("--output-csv", default=DEFAULT_OUTPUT_CSV)
     parser.add_argument("--val-ratio", type=float, default=DEFAULT_VAL_RATIO)

@@ -40,7 +40,7 @@ from src.ml.features.feature_extraction import FeatureConfig, HogConfig, LbpConf
 
 
 DEFAULT_SEED = 1337
-DEFAULT_DATASET_CSV = "data/interim/dataset_lsc70w.csv"
+DEFAULT_DATASET_CSV = "data/processed/dataset_lsc70anh_abcde.csv"
 DEFAULT_OUTPUT_DIR = "artifacts/experiments/feature_optimization"
 
 
@@ -164,7 +164,7 @@ def evaluate_trial(
     model = LogisticRegression(
         solver="lbfgs",
         C=0.1,
-        max_iter=100,
+        max_iter=50,
         n_jobs=-1,
     )
 

@@ -11,6 +11,8 @@ import joblib
 import numpy as np
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.neural_network import MLPClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 from .evaluate import evaluate_model
@@ -31,13 +33,19 @@ def train_svm(
     seed: int = DEFAULT_SEED,
     prefer_gpu: bool = True,
     **kwargs: Any,
-) -> SVC:
+) -> Pipeline:
     logger = logging.getLogger("model_training")
     if prefer_gpu:
         logger.info("GPU backend not available; using CPU (scikit-learn)")
 
+    kwargs.pop("kernel", None)
     model_params = {"kernel": "rbf", "probability": False, "random_state": seed, **kwargs}
-    model = SVC(**model_params)
+    model = Pipeline(
+        [
+            ("scaler", StandardScaler()),
+            ("svc", SVC(**model_params)),
+        ]
+    )
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         model.fit(features, labels)

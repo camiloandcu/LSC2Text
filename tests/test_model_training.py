@@ -3,6 +3,9 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 
 from src.ml.training import evaluate_model, persist_artifacts, train_mlp, train_svm
 
@@ -19,6 +22,15 @@ class TestModelTraining(unittest.TestCase):
 
         self.assertIsNotNone(svm)
         self.assertIsNotNone(mlp)
+
+    def test_svm_uses_scaled_rbf_pipeline(self):
+        svm = train_svm(self.features, self.labels, prefer_gpu=False, kernel="poly", C=2.0)
+
+        self.assertIsInstance(svm, Pipeline)
+        self.assertIsInstance(svm.named_steps["scaler"], StandardScaler)
+        self.assertIsInstance(svm.named_steps["svc"], SVC)
+        self.assertEqual(svm.named_steps["svc"].kernel, "rbf")
+        self.assertEqual(svm.named_steps["svc"].C, 2.0)
 
     def test_evaluation_outputs(self):
         svm = train_svm(self.features, self.labels, prefer_gpu=False)

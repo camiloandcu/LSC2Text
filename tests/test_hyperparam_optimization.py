@@ -6,7 +6,13 @@ from pathlib import Path
 import numpy as np
 import optuna
 
-from src.ml.optimization import OptimizationConfig, create_objective, run_optimization
+from src.ml.optimization import (
+    OptimizationConfig,
+    create_objective,
+    params_from_trial,
+    run_optimization,
+    sample_svm_params,
+)
 
 
 class TestHyperparamOptimization(unittest.TestCase):
@@ -54,6 +60,8 @@ class TestHyperparamOptimization(unittest.TestCase):
             payload = json.loads(artifacts["best_params"].read_text(encoding="utf-8"))
             self.assertEqual(payload["model_type"], "svm")
             self.assertIn("params", payload)
+            self.assertNotIn("kernel", payload["params"])
+            self.assertNotIn("kernel", payload["trial_params"])
 
     def test_invalid_param_combos_are_pruned(self):
         config = OptimizationConfig(model_type="svm", n_trials=1)
@@ -72,6 +80,13 @@ class TestHyperparamOptimization(unittest.TestCase):
 
         with self.assertRaises(optuna.exceptions.TrialPruned):
             objective(optuna.trial.FixedTrial({}))
+
+    def test_svm_search_space_omits_kernel(self):
+        trial = optuna.trial.FixedTrial({"C": 1.0, "gamma": 0.01})
+        params = sample_svm_params(trial)
+
+        self.assertEqual(params, {"C": 1.0, "gamma": 0.01})
+        self.assertNotIn("kernel", params_from_trial("svm", params))
 
 
 if __name__ == "__main__":

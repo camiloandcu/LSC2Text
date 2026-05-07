@@ -33,6 +33,9 @@ echo "  Running dataset generation..."
 uv run ./scripts/generate_dataset_csv.py
 
 echo "  Filtering dataset..."
-uv run ./scripts/filter_lsc70w_dataset.py
+uv run ./scripts/filter_dataset.py
+
+echo "  Generating splits..."
+uv run ./scripts/split_dataset.py
 
 echo "✅ Setup complete!"
