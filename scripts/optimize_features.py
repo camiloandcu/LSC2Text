@@ -36,7 +36,7 @@ import matplotlib.pyplot as plt
 from skimage.feature import hog, local_binary_pattern
 
 from src.ml.preprocessing import PreprocessConfig, Preprocessor
-from src.ml.features.feature_extraction import FeatureConfig, HogConfig, LbpConfig, extract_features
+from src.ml.feature_extraction import FeatureConfig, HogConfig, LbpConfig, extract_features
 
 
 DEFAULT_SEED = 1337

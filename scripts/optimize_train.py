@@ -8,12 +8,12 @@ from typing import List, Tuple
 
 import numpy as np
 
-from src.ml.features.feature_extraction import FeatureConfig, extract_features
-from src.ml.optimization import OptimizationConfig, run_optimization
+from src.ml.feature_extraction import FeatureConfig, extract_features
+from src.ml.training import OptimizationConfig, run_optimization
 from src.ml.preprocessing import Preprocessor
 
 
-DEFAULT_SPLIT_CSV = "data/splits/dataset_lsc70w.csv"
+DEFAULT_SPLIT_CSV = "data/splits/dataset_lsc70anh_abcde.csv"
 DEFAULT_MODEL_TYPE = "svm"
 DEFAULT_TRIALS = 30
 DEFAULT_SEED = 1337

@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from src.ml.features.feature_extraction import FeatureConfig, LbpConfig, extract_features
+from src.ml.feature_extraction import FeatureConfig, LbpConfig, extract_features
 
 
 class TestFeatureExtraction(unittest.TestCase):

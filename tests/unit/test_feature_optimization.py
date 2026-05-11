@@ -10,7 +10,7 @@ from scripts.optimize_features import (
     validate_hog_params,
     validate_lbp_params,
 )
-from src.ml.features.feature_extraction import FeatureConfig, extract_features
+from src.ml.feature_extraction import FeatureConfig, extract_features
 
 
 def _write_image(path: Path) -> None:
