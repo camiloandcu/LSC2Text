@@ -3,10 +3,12 @@ from __future__ import annotations
 import argparse
 import csv
 import logging
+import sys
 from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
+from tqdm import tqdm
 
 from src.ml.feature_extraction import FeatureConfig, extract_features
 from src.ml.optimization import OptimizationConfig, run_optimization
@@ -35,27 +37,36 @@ def load_split_data(csv_path: Path) -> Tuple[np.ndarray, np.ndarray, np.ndarray,
             required = ", ".join(sorted(REQUIRED_MANIFEST_COLUMNS))
             raise ValueError(f"split CSV must include manifest columns: {required}")
 
-        for row_number, row in enumerate(reader, start=2):
-            split = row["split"]
-            if split not in {"train", "val"}:
-                continue
+        rows = list(reader)
 
-            image_path = resolve_manifest_path(row["filepath"], csv_path)
-            try:
-                image = preprocessor.process_path(str(image_path))
-                vector = extract_features(image, feature_config)
-            except Exception as exc:
-                raise OSError(
-                    f"could not extract features for row {row_number} "
-                    f"from '{row['filepath']}': {exc}"
-                ) from exc
+    # Wrap the feature extraction loop with tqdm for progress visualization
+    # disable=not sys.stdout.isatty() automatically suppresses progress bars in non-interactive contexts (CI, redirected output)
+    # desc="Preprocessing" labels the progress bar with operation context
+    # unit="sample" shows semantic units (samples processed per second)
+    for row_number, row in enumerate(
+        tqdm(rows, desc="Preprocessing", unit="sample", disable=not sys.stdout.isatty()),
+        start=2
+    ):
+        split = row["split"]
+        if split not in {"train", "val"}:
+            continue
 
-            if split == "train":
-                train_labels.append(row["label"])
-                train_features.append(vector)
-            else:
-                val_labels.append(row["label"])
-                val_features.append(vector)
+        image_path = resolve_manifest_path(row["filepath"], csv_path)
+        try:
+            image = preprocessor.process_path(str(image_path))
+            vector = extract_features(image, feature_config)
+        except Exception as exc:
+            raise OSError(
+                f"could not extract features for row {row_number} "
+                f"from '{row['filepath']}': {exc}"
+            ) from exc
+
+        if split == "train":
+            train_labels.append(row["label"])
+            train_features.append(vector)
+        else:
+            val_labels.append(row["label"])
+            val_features.append(vector)
 
     if not train_features:
         raise ValueError("no training rows found in split CSV")

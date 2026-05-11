@@ -39,7 +39,7 @@ def train_svm(
         logger.info("GPU backend not available; using CPU (scikit-learn)")
 
     kwargs.pop("kernel", None)
-    model_params = {"kernel": "rbf", "probability": False, "random_state": seed, **kwargs}
+    model_params = {"verbose": True,"kernel": "rbf", "probability": False, "random_state": seed, **kwargs}
     model = Pipeline(
         [
             ("scaler", StandardScaler()),

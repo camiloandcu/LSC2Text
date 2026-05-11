@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
@@ -11,6 +12,7 @@ import numpy as np
 import optuna
 from optuna.pruners import MedianPruner
 from optuna.samplers import TPESampler
+from tqdm import tqdm
 
 from src.ml.training import evaluate_model, persist_artifacts, train_mlp, train_svm
 
@@ -152,6 +154,10 @@ def run_optimization(
     )
 
     log_rows: List[dict] = []
+    # Create progress bar for trial tracking
+    # disable=not sys.stdout.isatty() automatically suppresses in non-interactive contexts (CI/logging)
+    # Callback updates the progress bar after each trial completes
+    pbar = tqdm(total=config.n_trials, desc="Trial", unit="trial", disable=not sys.stdout.isatty())
 
     def log_callback(_: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
         row = {
@@ -162,9 +168,11 @@ def run_optimization(
         }
         log_rows.append(row)
         _write_trial_log(log_rows, logs_dir / "trials.csv")
+        pbar.update(1)  # Increment progress bar after each trial
 
     objective = create_objective(features, labels, val_features, val_labels, config, search_space)
     study.optimize(objective, n_trials=config.n_trials, callbacks=[log_callback])
+    pbar.close()
 
     best_params = params_from_trial(config.model_type, study.best_trial.params)
     params_path = config.output_dir / "best_params.json"

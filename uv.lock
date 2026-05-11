@@ -276,6 +276,7 @@ dependencies = [
     { name = "optuna" },
     { name = "scikit-image" },
     { name = "scikit-learn" },
+    { name = "tqdm" },
 ]
 
 [package.metadata]
@@ -285,6 +286,7 @@ requires-dist = [
     { name = "optuna" },
     { name = "scikit-image" },
     { name = "scikit-learn" },
+    { name = "tqdm" },
 ]
 
 [[package]]
