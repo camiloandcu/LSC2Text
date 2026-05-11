@@ -67,7 +67,7 @@ class TestHyperparamOptimization(unittest.TestCase):
         config = OptimizationConfig(model_type="svm", n_trials=1)
 
         def invalid_space(_trial):
-            return {"C": -1.0, "gamma": 0.01, "kernel": "rbf"}
+            return {"C": -1.0}
 
         objective = create_objective(
             self.features,
@@ -82,10 +82,10 @@ class TestHyperparamOptimization(unittest.TestCase):
             objective(optuna.trial.FixedTrial({}))
 
     def test_svm_search_space_omits_kernel(self):
-        trial = optuna.trial.FixedTrial({"C": 1.0, "gamma": 0.01})
+        trial = optuna.trial.FixedTrial({"C": 1.0})
         params = sample_svm_params(trial)
 
-        self.assertEqual(params, {"C": 1.0, "gamma": 0.01})
+        self.assertEqual(params, {"C": 1.0})
         self.assertNotIn("kernel", params_from_trial("svm", params))
 
 

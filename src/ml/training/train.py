@@ -13,7 +13,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 
 from .evaluate import evaluate_model
 
@@ -38,12 +38,11 @@ def train_svm(
     if prefer_gpu:
         logger.info("GPU backend not available; using CPU (scikit-learn)")
 
-    kwargs.pop("kernel", None)
-    model_params = {"verbose": True,"kernel": "rbf", "probability": False, "random_state": seed, **kwargs}
+    model_params = {"verbose": True, "max_iter": 1000, "random_state": seed, **kwargs}
     model = Pipeline(
         [
             ("scaler", StandardScaler()),
-            ("svc", SVC(**model_params)),
+            ("svc", LinearSVC(**model_params)),
         ]
     )
     with warnings.catch_warnings(record=True) as caught:

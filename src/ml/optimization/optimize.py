@@ -37,8 +37,7 @@ class OptimizationConfig:
 
 def sample_svm_params(trial: optuna.trial.Trial) -> TrialParams:
     return {
-        "C": trial.suggest_float("C", 0.1, 10.0, log=True),
-        "gamma": trial.suggest_float("gamma", 1e-4, 1e-1, log=True),
+        "C": trial.suggest_float("C", 0.01, 100.0, log=True),
     }
 
 
@@ -59,7 +58,7 @@ def sample_mlp_params(trial: optuna.trial.Trial) -> TrialParams:
 def params_from_trial(model_type: str, params: TrialParams) -> TrialParams:
     _validate_model_type(model_type)
     if model_type == "svm":
-        train_params = {key: params[key] for key in ("C", "gamma")}
+        train_params = {key: params[key] for key in ("C")}
     else:
         train_params = dict(params)
         if isinstance(train_params.get("hidden_layer_sizes"), str):
@@ -75,8 +74,8 @@ def params_from_trial(model_type: str, params: TrialParams) -> TrialParams:
 def validate_params(model_type: str, params: TrialParams) -> None:
     _validate_model_type(model_type)
     if model_type == "svm":
-        if params["C"] <= 0 or params["gamma"] <= 0:
-            raise ValueError("SVM C and gamma must be positive")
+        if params["C"] <= 0:
+            raise ValueError("SVM C must be positive")
         return
 
     hidden = params["hidden_layer_sizes"]
