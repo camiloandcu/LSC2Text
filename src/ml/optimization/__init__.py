@@ -1,6 +1,6 @@
 """Hyperparameter optimization utilities."""
 
-from ..training.optimize import (
+from .optimize import (
     OptimizationConfig,
     create_median_pruner,
     create_objective,

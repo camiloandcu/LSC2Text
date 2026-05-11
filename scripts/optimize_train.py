@@ -9,7 +9,7 @@ from typing import List, Tuple
 import numpy as np
 
 from src.ml.feature_extraction import FeatureConfig, extract_features
-from src.ml.training import OptimizationConfig, run_optimization
+from src.ml.optimization import OptimizationConfig, run_optimization
 from src.ml.preprocessing import Preprocessor
 
 
