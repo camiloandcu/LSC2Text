@@ -38,6 +38,7 @@ class OptimizationConfig:
 def sample_svm_params(trial: optuna.trial.Trial) -> TrialParams:
     return {
         "C": trial.suggest_float("C", 0.01, 100.0, log=True),
+        "loss": trial.suggest_categorical("loss", ["hinge", "squared_hinge"]),
     }
 
 
@@ -58,7 +59,7 @@ def sample_mlp_params(trial: optuna.trial.Trial) -> TrialParams:
 def params_from_trial(model_type: str, params: TrialParams) -> TrialParams:
     _validate_model_type(model_type)
     if model_type == "svm":
-        train_params = {key: params[key] for key in ("C")}
+        train_params = {key: params[key] for key in ("C", "loss")}
     else:
         train_params = dict(params)
         if isinstance(train_params.get("hidden_layer_sizes"), str):
@@ -76,6 +77,8 @@ def validate_params(model_type: str, params: TrialParams) -> None:
     if model_type == "svm":
         if params["C"] <= 0:
             raise ValueError("SVM C must be positive")
+        if params["loss"] not in {"hinge", "squared_hinge"}:
+            raise ValueError("SVM loss must be 'hinge' or 'squared_hinge'")
         return
 
     hidden = params["hidden_layer_sizes"]

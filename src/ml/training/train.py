@@ -23,7 +23,7 @@ DEFAULT_SEED = 1337
 
 def _log_convergence_warnings(caught: list[warnings.WarningMessage], logger: logging.Logger) -> None:
     for warning in caught:
-        if isinstance(warning.message, ConvergenceWarning):
+        if isinstance(warning.meFssage, ConvergenceWarning):
             logger.warning("%s", warning.message)
 
 
