@@ -1,10 +1,5 @@
-# ///script
+# /// script
 # dependencies =[
-#    "argparse",
-#    "csv",
-#    "re",
-#    "pathlib",
-#    "typing",
 # ]
 # ///
 
@@ -77,9 +72,9 @@ def main() -> int:
     )
     parser.add_argument(
         "--root",
-        default=Path("data/raw"),
+        default=Path("data/raw/LSC70"),
         type=Path,
-        help="Root folder that contains sections (default: data/raw).",
+        help="Root folder that contains sections (default: data/raw/LSC70).",
     )
     parser.add_argument(
         "--output",

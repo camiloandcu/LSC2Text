@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card stack">
+    <div>
+        <h2>Predict a Sign</h2>
+        <p>Choose a single image and upload it to get predictions</p>
+    </div>
+
+    <form class="stack" action="/frontend/predict" method="post" enctype="multipart/form-data">
+        <div class="field">
+            <label for="image">Select Image</label>
+            <input id="image" name="image" type="file" accept="image/*" required />
+        </div>
+
+        <button class="button" type="submit">Upload and Predict</button>
+    </form>
+
+    <div class="meta">
+        <span>Model: {{ default_model_path }}</span>
+        <span> - Top predictions: {{ top_k }}</span>
+    </div>
+</section>
+{% endblock %}

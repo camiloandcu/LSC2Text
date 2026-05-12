@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card stack">
+    <div class="error">
+        <strong>Unable to Process Your Upload</strong>
+        <p>{{ message }}</p>
+    </div>
+
+    <div>
+        <a class="button" href="/">Back to Upload Form</a>
+    </div>
+</section>
+{% endblock %}

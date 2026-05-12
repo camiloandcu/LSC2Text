@@ -5,10 +5,17 @@ build/
 dist/
 wheels/
 *.egg-info
+.tmp/
 
 # Virtual environments
 .venv
 
 # Data files
-data/raw/
+data/
+
+# Artifacts
+artifacts/
+models/
+test1/
+
 
