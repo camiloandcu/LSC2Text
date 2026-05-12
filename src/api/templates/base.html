@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ service_name }}</title>
+    <style>
+        :root {
+            color-scheme: light;
+            
+            --forest-950: #0d2818;
+            --forest-900: #1a381e;
+            --forest-800: #1f5233;
+            --forest-700: #2d6a4f;
+            --forest-600: #40916c;
+            --forest-500: #52b788;
+            --forest-400: #74c69d;
+            --forest-300: #9fd4b0;
+            --forest-200: #b7e4c7;
+            --forest-100: #d8f3dc;
+            --forest-50: #edf6f0;
+
+            --sage-700: #7a8f78;
+            --sage-600: #9fb996;
+            --sage-500: #a8b8a8;
+            --sage-300: #c5d0c0;
+            --sage-200: #d9e3d6;
+            --sage-100: #eff0ed;
+
+            --stone-800: #3f3f46;
+            --stone-700: #52525b;
+            --stone-600: #6b7280;
+            --stone-500: #78716c;
+            --stone-300: #d4d4d8;
+            --stone-200: #e4e4e7;
+            --stone-100: #f4f4f5;
+            --stone-50: #fafaf9;
+
+            --cream: #faf9f7;
+            --danger-600: #dc2626;
+            --success-600: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--stone-50) 0%, var(--forest-50) 100%);
+            color: var(--stone-800);
+            min-height: 100vh;
+        }
+
+        .shell {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .brand h1 {
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            margin: 0;
+            color: var(--forest-800);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            margin: 0;
+            color: var(--stone-600);
+            font-size: 0.95rem;
+        }
+
+        /* Utility classes for styling */
+        .card {
+            background: var(--cream);
+            border: 1px solid var(--forest-200);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(31, 82, 51, 0.07), 0 10px 20px rgba(0, 0, 0, 0.04);
+            padding: 28px;
+        }
+
+        .meta {
+            display: inline-flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            color: var(--stone-600);
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: var(--forest-100);
+            color: var(--forest-700);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 16px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field label {
+            display: block;
+            font-weight: 600;
+            color: var(--forest-800);
+            font-size: 0.95rem;
+        }
+
+        .field input[type="file"] {
+            width: 100%;
+            border: 2px dashed var(--forest-300);
+            border-radius: 12px;
+            padding: 16px 14px;
+            background: var(--forest-50);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .field input[type="file"]:hover {
+            border-color: var(--forest-400);
+            background: var(--forest-100);
+        }
+
+        .field input[type="file"]:focus {
+            outline: none;
+            border-color: var(--forest-600);
+            box-shadow: 0 0 0 3px rgba(64, 145, 108, 0.1);
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            background: var(--forest-600);
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .button:hover {
+            background: var(--forest-700);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(64, 145, 108, 0.25);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button.secondary {
+            background: var(--forest-100);
+            color: var(--forest-700);
+        }
+
+        .button.secondary:hover {
+            background: var(--forest-200);
+            color: var(--forest-800);
+        }
+
+        .result-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 18px;
+            border: 1px solid var(--forest-200);
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--forest-50) 0%, var(--sage-100) 100%);
+            transition: all 0.2s ease;
+        }
+
+        .result-item:hover {
+            border-color: var(--forest-300);
+            box-shadow: 0 2px 8px rgba(64, 145, 108, 0.12);
+        }
+
+        .result-item>div:first-child {
+            flex: 1;
+        }
+
+        .result-item strong {
+            display: block;
+            color: var(--forest-800);
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+        }
+
+        .result-item span {
+            display: block;
+            color: var(--stone-600);
+            font-size: 0.85rem;
+        }
+
+        .result-item>div:last-child {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--forest-700);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .image-preview {
+            margin: 16px 0;
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--forest-50);
+            border: 1px solid var(--forest-200);
+            text-align: center;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 360px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .error {
+            border-left: 4px solid var(--danger-600);
+            background: #fef2f2;
+            color: var(--danger-600);
+            padding: 18px 20px;
+            border-radius: 10px;
+        }
+
+        .error strong {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .error p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: var(--forest-800);
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0 0 8px 0;
+            color: var(--stone-700);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                padding: 20px 14px 36px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .result-item>div:last-child {
+                width: 100%;
+                text-align: left;
+            }
+
+            .brand {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            h2 {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="shell">
+        <header class="brand">
+            <div>
+                <h1>{{ service_name }}</h1>
+                <p>Upload an image to predict the sign language content</p>
+            </div>
+        </header>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+
+</html>

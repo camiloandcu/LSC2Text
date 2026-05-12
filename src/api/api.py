@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from scripts.infer import DEFAULT_MODEL_PATH, DEFAULT_TOP_K, run_inference
@@ -46,6 +48,30 @@ class MetadataResponse(BaseModel):
     endpoints: list[str]
 
 
+TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+
+
+def _predict_from_image_path(image_path: Path, settings: ApiSettings) -> PredictResponse:
+    return PredictResponse.model_validate(
+        run_inference(
+            image_path,
+            settings.model_path,
+            top_k=settings.top_k,
+        )
+    )
+
+
+def _format_predictions(predictions: list[PredictionItem]) -> list[dict[str, str]]:
+    return [
+        {
+            "label": prediction.label,
+            "confidence_percent": f"{prediction.confidence * 100:.2f}%",
+        }
+        for prediction in predictions
+    ]
+
+
 def create_app(settings: ApiSettings | None = None) -> FastAPI:
     settings = settings or ApiSettings()
     app = FastAPI(title=settings.service_name, version=settings.service_version)
@@ -63,6 +89,18 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
         return JSONResponse(
             status_code=422,
             content={"error": "validation_error", "details": exc.errors()},
+        )
+
+    @app.get("/", response_class=HTMLResponse)
+    def index(request: Request) -> HTMLResponse:
+        return templates.TemplateResponse(
+            request,
+            "upload.html",
+            {
+                "service_name": settings.service_name,
+                "default_model_path": str(settings.model_path),
+                "top_k": settings.top_k,
+            },
         )
 
     @app.get("/health", response_model=HealthResponse)
@@ -95,17 +133,80 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
                 handle.write(raw_bytes)
                 temp_path = Path(handle.name)
 
-            return PredictResponse.model_validate(
-                run_inference(
-                    temp_path,
-                    settings.model_path,
-                    top_k=settings.top_k,
-                )
-            )
+            return _predict_from_image_path(temp_path, settings)
         except FileNotFoundError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         except Exception as exc:
             raise HTTPException(status_code=400, detail=f"invalid image file: {exc}") from exc
+        finally:
+            if temp_path is not None:
+                temp_path.unlink(missing_ok=True)
+
+    @app.post("/frontend/predict", response_class=HTMLResponse)
+    def predict_frontend(request: Request, image: UploadFile = File(...), submit_label: str = Form("Upload image")) -> HTMLResponse:
+        del submit_label
+        if not image.filename:
+            return templates.TemplateResponse(
+                request,
+                "error.html",
+                {
+                    "service_name": settings.service_name,
+                    "message": "Please choose a valid image file before submitting.",
+                },
+                status_code=400,
+            )
+
+        raw_bytes = image.file.read()
+        if not raw_bytes:
+            return templates.TemplateResponse(
+                request,
+                "error.html",
+                {
+                    "service_name": settings.service_name,
+                    "message": "The uploaded file was empty or unreadable.",
+                },
+                status_code=400,
+            )
+
+        suffix = Path(image.filename).suffix or ".img"
+        temp_path: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
+                handle.write(raw_bytes)
+                temp_path = Path(handle.name)
+
+            prediction = _predict_from_image_path(temp_path, settings)
+            image_data_b64 = base64.b64encode(raw_bytes).decode("utf-8")
+            return templates.TemplateResponse(
+                request,
+                "result.html",
+                {
+                    "service_name": settings.service_name,
+                    "image_data": image_data_b64,
+                    "default_model_path": str(settings.model_path),
+                    "predictions": _format_predictions(prediction.predictions),
+                },
+            )
+        except FileNotFoundError:
+            return templates.TemplateResponse(
+                request,
+                "error.html",
+                {
+                    "service_name": settings.service_name,
+                    "message": "The configured model could not be found.",
+                },
+                status_code=503,
+            )
+        except Exception:
+            return templates.TemplateResponse(
+                request,
+                "error.html",
+                {
+                    "service_name": settings.service_name,
+                    "message": "The uploaded file is not a valid image.",
+                },
+                status_code=400,
+            )
         finally:
             if temp_path is not None:
                 temp_path.unlink(missing_ok=True)

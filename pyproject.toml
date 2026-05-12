@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
 "fastapi",
+"httpx",
 "opencv-python",
+"jinja2",
 "scikit-image",
 "scikit-learn",
 "optuna",

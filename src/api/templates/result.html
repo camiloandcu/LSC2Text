@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card stack">
+    <div>
+        <div class="badge">Prediction Result</div>
+        <h2>Predictions</h2>
+        <p>Top {{ predictions|length }} predictions for your image</p>
+    </div>
+
+    {% if image_data %}
+    <div class="image-preview">
+        <img src="data:image/jpeg;base64,{{ image_data }}" alt="Uploaded image" />
+    </div>
+    {% endif %}
+
+    <div>
+        <h3 style="margin: 12px 0 8px 0; font-size: 1rem; color: var(--stone-700)">Results</h3>
+        <ul class="result-list">
+            {% for item in predictions %}
+            <li class="result-item">
+                <div>
+                    <strong>{{ loop.index }}. {{ item.label }}</strong>
+                    <span>Ranked prediction</span>
+                </div>
+                <div>{{ item.confidence_percent }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="meta">
+        <span>Model: {{ default_model_path }}</span>
+    </div>
+
+    <div>
+        <a class="button secondary" href="/">Predict Another Image</a>
+    </div>
+</section>
+{% endblock %}

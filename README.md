@@ -53,3 +53,15 @@ Available endpoints:
 - `POST /predict` accepts one uploaded image and returns ranked predictions as JSON
 
 The API uses the same inference pipeline as `scripts/infer.py` and is intended for local development and testing.
+
+## Web Frontend
+
+Start the bundled backend and open the browser UI at the server root:
+
+```bash
+uv run python -m src.api.api --model-path models/registry/svm/direct-svm-20260511-220859/model.joblib --port 8000
+```
+
+Then visit `http://127.0.0.1:8000/` to upload a single image and view the rendered prediction result.
+
+The frontend uses server-rendered templates and is designed to work locally with the backend API.
