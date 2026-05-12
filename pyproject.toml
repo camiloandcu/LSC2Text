@@ -5,10 +5,13 @@ description = "Recognition of Colombian Sign Language (LSC) signs from static im
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+"fastapi",
 "opencv-python",
 "scikit-image",
 "scikit-learn",
 "optuna",
 "matplotlib",
+"python-multipart",
+"uvicorn",
 "tqdm"
 ]
