@@ -1,4 +1,4 @@
-# LSC2Text: Reconocimiento y Traducción de Lenguaje de Señas Colombiano a Texto
+# LSC2Text: Reconocimiento y Traducción de Lengua de Señas Colombiano a Texto 🇨🇴
 
 **Tabla de Contenidos**
 
@@ -8,7 +8,7 @@
 4. [Preprocesamiento de Imágenes](#preprocesamiento-de-imágenes)
 5. [Extracción de Features](#extracción-de-features)
 6. [Escalado de Features](#escalado-de-features)
-7. [Máquina de Vectores de Soporte (SVM)](#modelos-de-aprendizaje-automático)
+7. [Máquina de Vectores de Soporte (SVM)](#máquina-de-vectores-de-soporte-svm)
 8. [Optimización de Parámetros](#optimización-de-parámetros)
 9. [Arquitectura del Sistema](#arquitectura-del-sistema)
 
@@ -16,7 +16,7 @@
 
 ## Por qué LSC2Text?
 
-LSC2Text es un sistema de reconocimiento automático de lengua de signos que convierte imágenes de gestos en texto. Este proyecto demuestra que es posible combinar técnicas de visión por computadora con aprendizaje automático para resolver un problema de accesibilidad real.
+LSC2Text es un sistema de reconocimiento automático de lengua de señas que convierte imágenes de gestos en texto. Este proyecto demuestra que es posible combinar técnicas de visión por computadora con aprendizaje automático para resolver un problema de accesibilidad real.
 
 ---
 
@@ -24,30 +24,22 @@ LSC2Text es un sistema de reconocimiento automático de lengua de signos que con
 
 ### ¿Qué problema estamos resolviendo?
 
-La lengua de signos es la lengua natural de las personas sordas, pero muchos sistemas tecnológicos aún no la integran adecuadamente. Los traductores automáticos de lenguaje de signos a texto podrían mejorar significativamente la accesibilidad en comunicación en tiempo real, educación y redes sociales.
+La lengua de señas colombiana es la lengua natural de la comunidad sorda en el país; sin embargo, aún existe una ausencia de herramientas tecnológicas diseñadas específicamente para su aprendizaje y uso. Esta falta de recursos limita tanto la accesibilidad como las oportunidades de inclusión. En este contexto, el desarrollo de sistemas automáticos que permitan traducir lengua de señas a texto no solo facilitaría la comunicación en tiempo real, sino que también podría convertirse en una herramienta educativa clave para que más personas aprendan y se familiaricen con la LSC, fortaleciendo así la inclusión en ámbitos como la educación, las redes sociales y la vida cotidiana.
 
 LSC2Text se enfoca en:
 
-- **Reconocimiento visual de signos**: Procesar imágenes de signos del lenguaje de signos para identificar qué seña se está realizando
-- **Clasificación automática**: Agrupar signos en categorías predefinidas con confianza medible
+- **Reconocimiento visual de señas**: Procesar imágenes del LSC para identificar qué seña se está realizando
+- **Clasificación automática**: Agrupar señas en categorías predefinidas con confianza medible
 - **Aplicación práctica**: Crear una API y frontend accesibles para demostración
 
-### ¿Por qué ahora?
+### Contexto: Lingüística de la Lengua de Señas
 
-- **Disponibilidad de datos**: Los datasets de lengua de signos son ahora más accesibles (ej: LSC70)
-- **Hardware asequible**: GPUs y CPUs modernas hacen factible el procesamiento en tiempo real
-- **Técnicas comprobadas**: Métodos como HOG y LBP funcionan bien incluso sin redes neuronales profundas
-- **Oportunidad de impacto**: Cada mejora en el reconocimiento automático contribuye a la inclusión
-
-### Contexto: Lingüística de la Lengua de Signos
-
-La lengua de signos no es un sistema de mímica, sino una lengua con estructura gramatical compleja:
+El lengauje de señas tiene una estructura gramatical compleja:
 
 - **Parámetros articulatorios**: Ubicación, movimiento, forma de la mano, orientación y expresión facial
-- **Composición de signos**: Cada seña combine estos parámetros simultáneamente (no secuencialmente como en lengua hablada)
 - **Variabilidad individual**: Diferentes personas pueden realizar el mismo signo con variaciones personales
 
-Este proyecto se enfoca en clasificar signos individuales, que es el primer paso hacia traducción de frases completas.
+Este proyecto se enfoca en clasificar señas individuales, que es el primer paso hacia traducción de frases completas.
 
 ---
 
@@ -55,35 +47,46 @@ Este proyecto se enfoca en clasificar signos individuales, que es el primer paso
 
 ### Descripción General
 
-El proyecto utiliza el dataset **LSC70**, un conjunto de imágenes de Lenguaje de Señas Colombiana:
+El proyecto utiliza el dataset **LSC70** (Disponible en https://data.mendeley.com/datasets/9ssyn8tff5/2), un conjunto de imágenes de Lengua de Señas Colombiana:
 
-- **Origen**: Compilado por investigadores del procesamiento de lengua de signos
-- **Cobertura**: 70 signos diferentes de uso frecuente
+- **Origen**: Compilado por investigadores del procesamiento de lengua de señas
+- **Cobertura**: 70 señas diferentes de uso frecuente
 - **Composición**:
-  - Total de imágenes: ~7,000
-  - Signos únicos: 70 categorías
-  - Variaciones: Múltiples observaciones por signo (diferentes personas, ángulos, condiciones de iluminación)
+  - Total de imágenes: ~35,000
+  - Señas únicas: 47 categorías, 5 imágenes por cada participante
+  - Participantes: 70
 
 ### Estructura de Carpetas
 
 ```
 data/
 ├── raw/
-│   ├── dataset.csv          # Índice original del dataset
-│   ├── LSC70/
-│   │   ├── LSC70AN/        # Señas del alfabeto
-│   │   ├── LSC70ANH/       # Señas del alfabeto, mano
-│   │   └── LSC70W/         # Señas generales
-│   └── ...
+│   ├── dataset.csv                  # Índice original del dataset
+│   └── LSC70/
+│       ├── LSC70AN/                 # Señas del alfabeto
+│       ├── LSC70ANH/                # Señas del alfabeto, mano
+│       └── LSC70W/                  # Señas generales
 ├── processed/
 │   └── dataset_lsc70anh_abcde.csv   # Índice con rutas
 └── splits/
     └── dataset_lsc70anh_abcde.csv   # División train/val
+
+src/
+├── api/                      # Todo lo relacionado con el backend
+│   └── templates/            # HTML para mostrar lo devuelto por endpoints     
+└── ml/                       # Todo lo relacionado con el modelo
+    ├── optimization/         # Módulo para optimización del modelo
+    └── training/             # Módulo para entrenar el modelo
+
+tests/
+├── integration/              # Pruebas de integración
+└── unit/                     # Pruebas unitarias
+       
 ```
 
 ### División del Dataset
 
-El dataset se divide en tres conjuntos:
+El dataset se dividió en dos conjuntos:
 
 - **Entrenamiento (Train)**: 80% usado para entrenar el modelo
 - **Validación (Validation)**: 20% usado para evaluar el modelo
@@ -103,7 +106,6 @@ Las imágenes crudas del dataset varían en:
 - **Tamaño**: Diferentes resoluciones y relaciones de aspecto
 - **Iluminación**: Brillo variable según condiciones de captura
 - **Fondo**: Fondos heterogéneos
-- **Escala**: Tamaño relativo del objeto en la imagen
 
 El preprocesamiento normaliza estas variaciones para mejorar la consistencia del modelo.
 
@@ -153,7 +155,7 @@ Donde:
 4. Promediar en celdas (ej: bloques de 8×8 píxeles)
 5. Concatenar todos los histogramas
 
-**¿Por qué HOG para signos?**
+**¿Por qué HOG para señas?**
 
 - Las manos tienen contornos y bordes claros
 - La orientación de dedos y palma son críticas para la forma del signo
@@ -184,10 +186,9 @@ Donde:
 4. Histograma de valores LBP en regiones
 5. Concatenar histogramas
 
-**¿Por qué LBP para signos?**
+**¿Por qué LBP para señas?**
 
-- Captura microestructura de piel y texturas de manos
-- Distintos signos tienen diferentes "texturas" de patrones de luz
+- Captura cambio en texturas entre manos y fondos
 - Computacionalmente muy rápido
 
 ### Configuración de Features
@@ -265,7 +266,7 @@ Las estadísticas se calculan SOLO en train set y se aplican consistentemente a 
 
 ## Máquina de Vectores de Soporte (SVM)
 
-**Idea intuitiva:** Encontrar un hiperplano (línea/plano) que mejor separe las clases.
+Estos modelos intentan encontrar un hiperplano (puede ser una línea o un plano) que mejor separe las clases.
 
 **Función de decisión:**
 
@@ -299,19 +300,18 @@ Donde:
 
 ### Búsqueda Bayesiana con Optuna
 
-**¿Qué es Optuna?** Una librería Python que automáticamente busca hiperparámetros óptimos usando:
+Optuna es una librería de Python que automáticamente busca hiperparámetros óptimos usando:
 
-1. **Prueba aleatoria inicial** para explorar el espacio
-2. **Observar resultados** para aprender qué zonas son prometedoras
-3. **Enfoque en zonas prometedoras** para explotar el mejor comportamiento
+1. **Hacer una prueba aleatoria inicial** para explorar el espacio
+2. **Observa los resultados** para aprender qué zonas son prometedoras
+3. **Se enfoca en zonas prometedoras** para explotar el mejor comportamiento
 
 **Objetivos de Optimización:**
 
-La búsqueda de Optuna optimiza múltiples métricas según el contexto:
+La búsqueda de Optuna optimiza dos métricas importantes:
 
-- **Exactitud (Accuracy)**: Porcentaje de predicciones correctas en el conjunto de validación
+- **Accuracy**: Porcentaje de predicciones correctas en el conjunto de validación
 - **Macro F1-Score**: Media armónica ponderada, importante para clases desbalanceadas
-- **Tiempo de entrenamiento**: Minimizar para iteraciones rápidas sin sacrificar calidad
 
 ### Optimización de Features
 
@@ -325,7 +325,7 @@ Estos afectan el tamaño y calidad del vector de features.
 
 **Proceso de Optimización de Features:**
 
-Se ejecutaron **30 trials** de Optuna probando diferentes combinaciones, con un modelo de regresión de prueba:
+Se ejecutaron **30 trials** de Optuna probando diferentes combinaciones, con un modelo de regresión (como prueba):
 
 - `lbp_radius`: 1-3 (radio de vecindad)
 - `hog_orientations`: 6-12 (número de bins de orientación)
@@ -339,16 +339,16 @@ Cada trial:
 3. Evalúa en validation set
 4. Registra la exactitud
 
-Los mejores trials convergen hacia parámetros que capturan características de signos efectivamente.
+Los mejores trials convergen hacia parámetros que capturan características de la seña efectivamente.
 
-### Optimización Conjunta
+### Optimización de Modelo
 
-El verdadero poder es optimizar **feature parameters + model hyperparameters juntos**:
+Después de obtener los mejores parámetros para la extracción de features, intentamos hallar los mejores hiperparámetros para los modelos:
 
-1. Generar features con ciertos parámetros
+1. Generar features con los mejores parámetros obtenidos
 2. Entrenar modelo con ciertos hiperparámetros
 3. Medir desempeño en validación
-4. Repetir ajustando todo
+4. Obtener los mejores hiperparámetros y entrenarlos
 
 Esto se implementa en: [scripts/optimize_train.py](scripts/optimize_train.py)
 
@@ -358,17 +358,7 @@ Esto se implementa en: [scripts/optimize_train.py](scripts/optimize_train.py)
 
 ![Feature Optimization Results](artifacts/experiments/feature_optimization/plots/best_trial.png)
 
-Esta imagen muestra cómo el desempeño mejora a través de iteraciones de Optuna, descubriendo la mejor combinación de tamaño de ventana, stride y configuración de HOG/LBP.
-
-**Optimización de Hiperparámetros del Modelo:**
-
-![Model Hyperparameter Optimization](artifacts/experiments/hyperparam_optimization/best.png)
-
-Esta imagen muestra el reporte de clasificación devuelto por el mejor modelo obtenido.
-
-### Parámetros Óptimos Encontrados
-
-**Configuración de Features (HOG+LBP):**
+Esta imagen muestra cómo se ve el preprocesado, HOG y LBP con los parámetros optimizados. Los parámetros óptimos obtenidos hasta el momento son: 
 
 ```json
 {
@@ -379,12 +369,12 @@ Esta imagen muestra el reporte de clasificación devuelto por el mejor modelo ob
 }
 ```
 
-**Interpretación:**
+**Optimización de Hiperparámetros del Modelo:**
 
-- `lbp_radius=3`: Los vecinos de LBP se toman en un radio de 3 píxeles (8 vecinos)
-- `hog_orientations=11`: 11 bins de orientación (en lugar del estándar 9)
-- `hog_pixels_per_cell=4`: Células pequeñas de 4×4 píxeles para mayor granularidad
-- `hog_cells_per_block=2`: Bloques de 2×2 células para normalización
+![Model Hyperparameter Optimization](artifacts/experiments/hyperparam_optimization/best.png)
+
+Esta imagen muestra el reporte de clasificación devuelto por el mejor modelo obtenido.
+
 
 ---
 
@@ -463,11 +453,3 @@ Plantillas en: [src/api/templates/](src/api/templates/)
 - `upload.html`: Formulario de carga
 - `result.html`: Muestra predicciones + imagen subida
 - `error.html`: Manejo de errores
-
-### Visualización de Resultados
-
-Las predicciones se muestran como:
-
-1. **Ranking Top-3** de signos predichos
-2. **Confianzas** expresadas como porcentajes
-3. **Navegación** para hacer otra predicción

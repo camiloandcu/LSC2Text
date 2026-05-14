@@ -182,6 +182,10 @@ def evaluate_trial(
 
 
 def sample_params(trial: optuna.trial.Trial) -> Tuple[HogConfig, LbpConfig]:
+    """
+    Sample hyperparameters for HOG and LBP configurations.
+    """
+
     radius = trial.suggest_int("lbp_radius", 1, 3)
     n_points = 8 * radius
     orientations = trial.suggest_int("hog_orientations", 6, 12)
